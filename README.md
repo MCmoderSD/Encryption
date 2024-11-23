@@ -22,7 +22,7 @@ Add the dependency to your `pom.xml` file:
 ```xml
 <dependency>
     <groupId>com.github.MCmoderSD</groupId>
-    <artifactId>encryption</artifactId>
+    <artifactId>Encryption</artifactId>
     <version>1.0.1</version>
 </dependency>
 ```
