@@ -3,7 +3,6 @@
 
 
 ## Description
-
 A simple Java encryption library for encrypting and decrypting text.
 
 
