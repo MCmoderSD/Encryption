@@ -1,5 +1,6 @@
 import de.MCmoderSD.encryption.core.Encryption;
 import de.MCmoderSD.encryption.enums.Algorithm;
+import de.MCmoderSD.encryption.enums.Transformer;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -14,10 +15,10 @@ public class Object {
         // Variables
         User user = new User("123456789");
         String password = "securepassword";
-        Algorithm algorithm = Algorithm.AES_ECB_PKCS5;
+        Transformer transformer = Transformer.AES_ECB_PKCS5;
 
         // Initialize Encryption
-        Encryption encryption = new Encryption(password, algorithm, Charset.defaultCharset());
+        Encryption encryption = new Encryption(password, Charset.defaultCharset(), transformer);
 
         // Serialize user object to byte array
         byte[] userBytes = Encryption.serialize(user);
