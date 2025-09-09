@@ -1,5 +1,6 @@
 import de.MCmoderSD.encryption.core.Encryption;
 import de.MCmoderSD.encryption.enums.Algorithm;
+import de.MCmoderSD.encryption.enums.Transformer;
 
 import java.nio.charset.Charset;
 
@@ -10,11 +11,12 @@ public class Text {
         // Variables
         String originalString = "Hello, World!";
         String password = "securepassword";
-        Algorithm algorithm = Algorithm.AES_ECB_PKCS5;
+        Transformer transformer = Transformer.AES_ECB_PKCS5;
 
 
         // Initialize Encryption
-        Encryption encryption = new Encryption(password, algorithm, Charset.defaultCharset());
+        Encryption encryption = new Encryption(password, Charset.defaultCharset(), transformer);
+
 
         // Print original string
         System.out.println("Original String: " + originalString + "\n");

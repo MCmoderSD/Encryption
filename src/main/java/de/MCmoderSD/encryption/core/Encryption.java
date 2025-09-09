@@ -1,6 +1,9 @@
 package de.MCmoderSD.encryption.core;
 
 import de.MCmoderSD.encryption.enums.Algorithm;
+import de.MCmoderSD.encryption.enums.Mode;
+import de.MCmoderSD.encryption.enums.Padding;
+import de.MCmoderSD.encryption.enums.Transformer;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,18 +19,19 @@ public class Encryption {
 
     // Attributes
     private final Charset charset;
-    private final Algorithm algorithm;
+    private final Transformer transformer;
     private final SecretKey secretKey;
 
     // Constructor
-    public Encryption(String password, Algorithm algorithm, Charset charset) {
+    public Encryption(String password, Charset charset, Transformer transformer) {
 
-        // Set Charset and Algorithm
+        // Set Charset and Transformer
         this.charset = charset;
-        this.algorithm = algorithm;
+        this.transformer = transformer;
+
 
         // Generate SecretKey
-        this.secretKey = generateKey(password, charset, "SHA-256", "AES");
+        this.secretKey = generateKey(password, charset, "SHA-256", transformer.getAlgorithm().name());
     }
 
     private static SecretKeySpec generateKey(String password, Charset charset, String hash, String algorithm) {
@@ -43,7 +47,7 @@ public class Encryption {
     // Encrypt byte[]
     public byte[] encrypt(byte[] decryptedData) {
         try {
-            Cipher encryptCipher = Cipher.getInstance(algorithm.getTransformation());
+            Cipher encryptCipher = Cipher.getInstance(transformer.getTransformation());
             encryptCipher.init(ENCRYPT_MODE, secretKey);
             return encryptCipher.doFinal(decryptedData);
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
@@ -54,7 +58,7 @@ public class Encryption {
     // Decrypt byte[]
     public byte[] decrypt(byte[] encryptedData) {
         try {
-            Cipher decryptCipher = Cipher.getInstance(algorithm.getTransformation());
+            Cipher decryptCipher = Cipher.getInstance(transformer.getTransformation());
             decryptCipher.init(DECRYPT_MODE, secretKey);
             return decryptCipher.doFinal(encryptedData);
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
