@@ -1,12 +1,9 @@
 package de.MCmoderSD.encryption.enums;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
-/**
- * Enum representing supported encryption algorithms
- * with their valid key sizes in bytes.
- */
+@SuppressWarnings("ALL")
 public enum Algorithm {
 
     // AES supports 128, 192, 256-bit keys → 16, 24, 32 bytes
@@ -19,15 +16,15 @@ public enum Algorithm {
     DESede(24);
 
     // Attributes
-    private final HashSet<Integer> keySizes;
+    private final ArrayList<Integer> keySizes;
 
     // Constructor
     Algorithm(int... keySize) {
-        keySizes = new HashSet<>(Arrays.asList(Arrays.stream(keySize).boxed().toArray(Integer[]::new)));
+        keySizes = new ArrayList<>(Arrays.stream(keySize).boxed().toList());
     }
 
     // Get valid key sizes
-    public HashSet<Integer> getKeySizes() {
+    public ArrayList<Integer> getKeySizes() {
         return keySizes;
     }
 

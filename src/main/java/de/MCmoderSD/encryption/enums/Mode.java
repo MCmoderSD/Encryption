@@ -1,25 +1,21 @@
 package de.MCmoderSD.encryption.enums;
 
+@SuppressWarnings("ALL")
 public enum Mode {
 
     // Modes
-    ECB(false),
-    CBC(true),
-    CFB(true),
-    OFB(true),
-    CTR(true),
-    GCM(true);
+    ECB(false); // Electronic Codebook
 
     // Attributes
     private final boolean needsIV;
 
     // Constructor
-    Mode(boolean needsIv) {
-        this.needsIV = needsIv;
+    Mode(boolean needsIV) {
+        this.needsIV = needsIV;
     }
 
     // Getter
-    public boolean needsIv() {
+    public boolean needsIV() {
         return needsIV;
     }
 }

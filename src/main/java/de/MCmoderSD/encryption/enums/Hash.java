@@ -1,17 +1,22 @@
 package de.MCmoderSD.encryption.enums;
 
+@SuppressWarnings("ALL")
 public enum Hash {
 
-
+    // Hash algorithms
+    SHA256("SHA-256", 32),      // 256 bits = 32 bytes
+    SHA3_256("SHA3-256", 32);   // 256 bits = 32 bytes
 
     // Attributes
     private final String name;
-    private final int size;
+    private final int bytes;
+    private final int bits;
 
     // Constructor
-    Hash(String name, int size) {
+    Hash(String name, int bytes) {
         this.name = name;
-        this.size = size;
+        this.bytes = bytes;
+        bits = bytes * 8;
     }
 
     // Getters
@@ -19,7 +24,11 @@ public enum Hash {
         return name;
     }
 
-    public int getSize() {
-        return size;
+    public int getBytes() {
+        return bytes;
+    }
+
+    public int getBits() {
+        return bits;
     }
 }

@@ -1,9 +1,6 @@
 package de.MCmoderSD.encryption.core;
 
-import de.MCmoderSD.encryption.enums.Algorithm;
-import de.MCmoderSD.encryption.enums.Mode;
-import de.MCmoderSD.encryption.enums.Padding;
-import de.MCmoderSD.encryption.enums.Transformer;
+import de.MCmoderSD.encryption.enums.*;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,57 +8,104 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.security.*;
 import java.util.Base64;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 
+@SuppressWarnings("ALL")
 public class Encryption {
 
     // Attributes
     private final Charset charset;
+    private final Hash hash;
     private final Transformer transformer;
-    private final SecretKey secretKey;
+    private final Algorithm algorithm;
+    private final Mode mode;
+    private final Padding padding;
+    private final SecretKeySpec key;
+
+    // Caches                                                       // Key: Input, Value: Output
+    private final ConcurrentHashMap<byte[], byte[]> encryptCache;   // Decrypted to Encrypted
+    private final ConcurrentHashMap<byte[], byte[]> decryptCache;   // Encrypted to Decrypted
 
     // Constructor
-    public Encryption(String password, Charset charset, Transformer transformer) {
-
-        // Set Charset and Transformer
-        this.charset = charset;
-        this.transformer = transformer;
-
-
-        // Generate SecretKey
-        this.secretKey = generateKey(password, charset, "SHA-256", transformer.getAlgorithm().name());
+    public Encryption(String password, Hash hash, Transformer transformer) {
+        this(password, Charset.defaultCharset(), hash, transformer);
     }
 
-    private static SecretKeySpec generateKey(String password, Charset charset, String hash, String algorithm) {
+    public Encryption(String password, Charset charset, Hash hash, Transformer transformer) {
+
+        // Set Attributes
+        this.charset = charset;
+        this.hash = hash;
+        this.transformer = transformer;
+        algorithm = transformer.getAlgorithm();
+        mode = transformer.getMode();
+        padding = transformer.getPadding();
+
+        // Generate SecretKeySpec
+        key = generateKey(password, charset, hash, algorithm);
+
+        // Initialize Caches
+        encryptCache = new ConcurrentHashMap<>();
+        decryptCache = new ConcurrentHashMap<>();
+    }
+
+    private static SecretKeySpec generateKey(String password, Charset charset, Hash hash, Algorithm algorithm) {
         try {
-            MessageDigest digest = MessageDigest.getInstance(hash);
-            byte[] keyBytes = digest.digest(password.getBytes(charset));
-            return new SecretKeySpec(keyBytes, algorithm);
+            MessageDigest messageDigest = MessageDigest.getInstance(hash.getName());
+            byte[] passwordHash = messageDigest.digest(password.getBytes(charset));
+            byte[] keyBytes = new byte[algorithm.getKeySizes().getLast()];
+            System.arraycopy(passwordHash, 0, keyBytes, 0, Math.min(passwordHash.length, keyBytes.length));
+            return new SecretKeySpec(keyBytes, algorithm.name());
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Failed to generate key", e);
+            throw new RuntimeException(e);
         }
     }
 
     // Encrypt byte[]
     public byte[] encrypt(byte[] decryptedData) {
+        if (!mode.needsIV() && encryptCache.containsKey(decryptedData)) return encryptCache.get(decryptedData);
         try {
-            Cipher encryptCipher = Cipher.getInstance(transformer.getTransformation());
-            encryptCipher.init(ENCRYPT_MODE, secretKey);
-            return encryptCipher.doFinal(decryptedData);
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
+
+            // Encrypt
+            Cipher cipher = Cipher.getInstance(transformer.getTransformation());
+            cipher.init(ENCRYPT_MODE, key);
+            byte[] encryptedData = cipher.doFinal(decryptedData);
+
+            // Cache if no IV is needed
+            if (!mode.needsIV()) {
+                encryptCache.put(decryptedData, encryptedData);
+                decryptCache.put(encryptedData, decryptedData);
+            }
+
+            // Return encrypted data
+            return encryptedData;
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException("Failed to encrypt data", e);
         }
     }
 
     // Decrypt byte[]
     public byte[] decrypt(byte[] encryptedData) {
+        if (!mode.needsIV() && decryptCache.containsKey(encryptedData)) return decryptCache.get(encryptedData);
         try {
-            Cipher decryptCipher = Cipher.getInstance(transformer.getTransformation());
-            decryptCipher.init(DECRYPT_MODE, secretKey);
-            return decryptCipher.doFinal(encryptedData);
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
+
+            // Decrypt
+            Cipher cipher = Cipher.getInstance(transformer.getTransformation());
+            cipher.init(DECRYPT_MODE, key);
+            byte[] decryptedData = cipher.doFinal(encryptedData);
+
+            // Cache if no IV is needed
+            if (!mode.needsIV()) {
+                decryptCache.put(encryptedData, decryptedData);
+                encryptCache.put(decryptedData, encryptedData);
+            }
+
+            // Return decrypted data
+            return decryptedData;
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException("Failed to decrypt data", e);
         }
     }
@@ -107,5 +151,40 @@ public class Encryption {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to deserialize object", e);
         }
+    }
+
+    // Getters
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public Hash getHash() {
+        return hash;
+    }
+
+    public Transformer getTransformer() {
+        return transformer;
+    }
+
+    public Algorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public Mode getMode() {
+        return mode;
+    }
+
+    public Padding getPadding() {
+        return padding;
+    }
+
+    public SecretKeySpec getKey() {
+        return key;
+    }
+
+    // Setter
+    public void clearCache() {
+        encryptCache.clear();
+        decryptCache.clear();
     }
 }
