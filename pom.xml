@@ -9,7 +9,7 @@
     <version>1.2.0</version>
 
     <name>Encryption</name>
-    <description>A simple encryption library</description>
+    <description>A simple and easy-to-use Java library for encrypting and decrypting strings and objects using various hashing and transformation algorithms</description>
 
     <distributionManagement>
         <repository>
