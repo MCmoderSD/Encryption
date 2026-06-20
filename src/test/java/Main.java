@@ -7,13 +7,13 @@ import java.util.Arrays;
 void main() {
 
     // Variables
-    String originalString = "Hello, World!";
-    String password = "secure-password";
-    Hash hash = Hash.SHA256;
-    Transformer transformer = Transformer.AES_ECB_PKCS5;
+    var originalString = "Hello, World!";
+    var password = "secure-password";
+    var hash = Hash.SHA256;
+    var transformer = Transformer.AES_ECB_PKCS5;
 
     // Initialize Encryption
-    Encryption encryption = new Encryption(password, hash, transformer);
+    var encryption = new Encryption(password, hash, transformer);
 
     // String Encryption/Decryption
     IO.println("\n --- String Encryption/Decryption --- \n");
@@ -22,14 +22,14 @@ void main() {
     IO.println("Original String: " + originalString + "\n");
 
     // Encrypt string
-    String encryptedString1 = encryption.encrypt(originalString);
-    String encryptedString2 = encryption.encrypt(originalString);
-    String encryptedString3 = encryption.encrypt(originalString);
+    var encryptedString1 = encryption.encrypt(originalString);
+    var encryptedString2 = encryption.encrypt(originalString);
+    var encryptedString3 = encryption.encrypt(originalString);
 
     // Decrypt string
-    String decryptedString1 = encryption.decrypt(encryptedString1);
-    String decryptedString2 = encryption.decrypt(encryptedString2);
-    String decryptedString3 = encryption.decrypt(encryptedString3);
+    var decryptedString1 = encryption.decrypt(encryptedString1);
+    var decryptedString2 = encryption.decrypt(encryptedString2);
+    var decryptedString3 = encryption.decrypt(encryptedString3);
 
     // Print results
     IO.println("Encrypted String 1: " + encryptedString1);
@@ -45,18 +45,18 @@ void main() {
 
 
     // Serialize original string to byte array and print bytes
-    byte[] originalBytes = Encryption.serialize(originalString);
+    var originalBytes = Encryption.serialize(originalString);
     IO.println("Original Bytes: " + Arrays.toString(originalBytes) + "\n");
 
     // Encrypt bytes
-    byte[] encryptedBytes1 = encryption.encrypt(originalBytes);
-    byte[] encryptedBytes2 = encryption.encrypt(originalBytes);
-    byte[] encryptedBytes3 = encryption.encrypt(originalBytes);
+    var encryptedBytes1 = encryption.encrypt(originalBytes);
+    var encryptedBytes2 = encryption.encrypt(originalBytes);
+    var encryptedBytes3 = encryption.encrypt(originalBytes);
 
     // Decrypt bytes
-    byte[] decryptedBytes1 = encryption.decrypt(encryptedBytes1);
-    byte[] decryptedBytes2 = encryption.decrypt(encryptedBytes2);
-    byte[] decryptedBytes3 = encryption.decrypt(encryptedBytes3);
+    var decryptedBytes1 = encryption.decrypt(encryptedBytes1);
+    var decryptedBytes2 = encryption.decrypt(encryptedBytes2);
+    var decryptedBytes3 = encryption.decrypt(encryptedBytes3);
 
     // Print results
     IO.println("Encrypted Bytes 1: " + Arrays.toString(encryptedBytes1));

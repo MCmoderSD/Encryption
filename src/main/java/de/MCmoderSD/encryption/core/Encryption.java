@@ -2,17 +2,28 @@ package de.MCmoderSD.encryption.core;
 
 import de.MCmoderSD.encryption.enums.*;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.InvalidKeyException;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 
+@SuppressWarnings("unused")
 public class Encryption {
 
     // Attributes
@@ -55,9 +66,9 @@ public class Encryption {
     // Generate SecretKeySpec from password
     private static SecretKeySpec generateKey(String password, Charset charset, Hash hash, Algorithm algorithm) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance(hash.getName());
-            byte[] passwordHash = messageDigest.digest(password.getBytes(charset));
-            byte[] keyBytes = new byte[algorithm.getKeySizes().getLast()];
+            var messageDigest = MessageDigest.getInstance(hash.getName());
+            var passwordHash = messageDigest.digest(password.getBytes(charset));
+            var keyBytes = new byte[algorithm.getKeySizes().getLast()];
             System.arraycopy(passwordHash, 0, keyBytes, 0, Math.min(passwordHash.length, keyBytes.length));
             return new SecretKeySpec(keyBytes, algorithm.name());
         } catch (NoSuchAlgorithmException e) {
@@ -71,9 +82,9 @@ public class Encryption {
         try {
 
             // Encrypt
-            Cipher cipher = Cipher.getInstance(transformer.getTransformation());
+            var cipher = Cipher.getInstance(transformer.getTransformation());
             cipher.init(ENCRYPT_MODE, key);
-            byte[] encryptedData = cipher.doFinal(decryptedData);
+            var encryptedData = cipher.doFinal(decryptedData);
 
             // Cache if no IV is needed
             if (!mode.needsIV()) {
@@ -83,6 +94,7 @@ public class Encryption {
 
             // Return encrypted data
             return encryptedData;
+
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException |
                  InvalidKeyException e) {
             throw new RuntimeException("Failed to encrypt data", e);
@@ -95,9 +107,9 @@ public class Encryption {
         try {
 
             // Decrypt
-            Cipher cipher = Cipher.getInstance(transformer.getTransformation());
+            var cipher = Cipher.getInstance(transformer.getTransformation());
             cipher.init(DECRYPT_MODE, key);
-            byte[] decryptedData = cipher.doFinal(encryptedData);
+            var decryptedData = cipher.doFinal(encryptedData);
 
             // Cache if no IV is needed
             if (!mode.needsIV()) {
@@ -107,6 +119,7 @@ public class Encryption {
 
             // Return decrypted data
             return decryptedData;
+
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException("Failed to decrypt data", e);
         }
@@ -133,8 +146,8 @@ public class Encryption {
     // Serialize Object
     public static byte[] serialize(Serializable object) {
         try (
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos)
+                var bos = new ByteArrayOutputStream();
+                var oos = new ObjectOutputStream(bos)
         ) {
             oos.writeObject(object);
             return bos.toByteArray();
@@ -145,10 +158,7 @@ public class Encryption {
 
     // Deserialize Object
     public static Object deserialize(byte[] bytes) {
-        try (
-                ByteArrayInputStream bai = new ByteArrayInputStream(bytes);
-                ObjectInputStream ois = new ObjectInputStream(bai)
-        ) {
+        try (var ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
             return ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to deserialize object", e);

@@ -6,7 +6,7 @@
 
     <groupId>de.MCmoderSD</groupId>
     <artifactId>Encryption</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 
     <name>Encryption</name>
     <description>A simple and easy-to-use Java library for encrypting and decrypting strings and objects using various hashing and transformation algorithms</description>
