@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
+import static java.lang.IO.println;
+
 record User(String ssn) implements Serializable { }
 
 void main() {
@@ -22,7 +24,7 @@ void main() {
 
     // Serialize user object to byte array
     var userBytes = Encryption.serialize(user);
-    IO.println("Original User Bytes: " + Base64.getEncoder().encodeToString(userBytes) + "\n");
+    println("Original User Bytes: " + Base64.getEncoder().encodeToString(userBytes) + "\n");
 
     // Benchmark Encryption
     var encryptTime1 = benchEncrypt(encryption, userBytes);
@@ -38,13 +40,13 @@ void main() {
 
     // Deserialize byte array back to user object
     var decryptedUser = (User) Encryption.deserialize(decryptedUserBytes);
-    IO.println("Decrypted User SSN: " + decryptedUser.ssn() + "\n");
+    println("Decrypted User SSN: " + decryptedUser.ssn() + "\n");
 
     // Print results
-    IO.println("Encrypted User Bytes: " + Base64.getEncoder().encodeToString(encryptedUserBytes));
-    IO.println("Decrypted User Bytes: " + Base64.getEncoder().encodeToString(decryptedUserBytes));
-    IO.println("Encryption Times (µs): " + encryptTime1 / 1000 + ", " + encryptTime2 / 1000 + ", " + encryptTime3 / 1000);
-    IO.println("Decryption Times (µs): " + decryptTime1 / 1000 + ", " + decryptTime2 / 1000 + ", " + decryptTime3 / 1000);
+    println("Encrypted User Bytes: " + Base64.getEncoder().encodeToString(encryptedUserBytes));
+    println("Decrypted User Bytes: " + Base64.getEncoder().encodeToString(decryptedUserBytes));
+    println("Encryption Times (µs): " + encryptTime1 / 1000 + ", " + encryptTime2 / 1000 + ", " + encryptTime3 / 1000);
+    println("Decryption Times (µs): " + decryptTime1 / 1000 + ", " + decryptTime2 / 1000 + ", " + decryptTime3 / 1000);
 }
 
 private static long benchEncrypt(Encryption encryption, byte[] input) {

@@ -4,6 +4,8 @@ import de.MCmoderSD.encryption.enums.Transformer;
 
 import java.nio.charset.Charset;
 
+import static java.lang.IO.println;
+
 void main() {
 
     // Variables
@@ -17,7 +19,7 @@ void main() {
     var encryption = new Encryption(password, charset, hash, transformer);
 
     // Print original string
-    IO.println("Original String: " + originalString + "\n");
+    println("Original String: " + originalString + "\n");
 
     // Benchmark Encryption
     var encryptTime1 = benchEncrypt(encryption, originalString);
@@ -32,10 +34,10 @@ void main() {
     var decryptedString = encryption.decrypt(encryptedString, charset);
 
     // Print results
-    IO.println("Encrypted String: " + encryptedString);
-    IO.println("Decrypted String: " + decryptedString + "\n");
-    IO.println("Encryption Times (µs): " + encryptTime1 / 1000 + ", " + encryptTime2 / 1000 + ", " + encryptTime3 / 1000);
-    IO.println("Decryption Times (µs): " + decryptTime1 / 1000 + ", " + decryptTime2 / 1000 + ", " + decryptTime3 / 1000);
+    println("Encrypted String: " + encryptedString);
+    println("Decrypted String: " + decryptedString + "\n");
+    println("Encryption Times (µs): " + encryptTime1 / 1000 + ", " + encryptTime2 / 1000 + ", " + encryptTime3 / 1000);
+    println("Decryption Times (µs): " + decryptTime1 / 1000 + ", " + decryptTime2 / 1000 + ", " + decryptTime3 / 1000);
 }
 
 private static long benchEncrypt(Encryption encryption, String input) {
